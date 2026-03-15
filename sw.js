@@ -1,5 +1,5 @@
-// ── Amulet Nexus Service Worker v3 ──
-const CACHE = 'amulet-nexus-v3';
+// ── Amulet Nexus Service Worker v4 ──
+const CACHE = 'amulet-nexus-v4'; // อัปเดตเป็น v4
 const ASSETS = [
   '/',
   '/index.html',
@@ -8,14 +8,14 @@ const ASSETS = [
   '/icon-512.png',
 ];
 
-// Install — cache core assets
+// Install — เก็บไฟล์ลงแคช
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
   );
 });
 
-// Activate — delete old caches
+// Activate — ลบแคชเวอร์ชันเก่า (v3) ทิ้ง
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -24,31 +24,17 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch — cache-first for local assets, network-first for API calls
+// Fetch — ระบบดึงข้อมูล
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-
-  // Skip non-GET and external API calls (Google, Anthropic)
   if (e.request.method !== 'GET') return;
-  if (url.hostname.includes('googleapis.com')) return;
-  if (url.hostname.includes('anthropic.com')) return;
-  if (url.hostname.includes('fonts.googleapis.com')) return;
-  if (url.hostname.includes('fonts.gstatic.com')) return;
-  if (url.hostname.includes('accounts.google.com')) return;
+  
+  // ไม่เก็บแคชจาก Supabase เพื่อให้ข้อมูลอัปเดตตลอดเวลา
+  if (url.hostname.includes('supabase.co')) return;
 
-  // Cache-first for same-origin
-  if (url.origin === self.location.origin) {
-    e.respondWith(
-      caches.match(e.request).then(cached => {
-        if (cached) return cached;
-        return fetch(e.request).then(res => {
-          if (res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy));
-          }
-          return res;
-        }).catch(() => caches.match('/index.html')); // offline fallback
-      })
-    );
-  }
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      return cached || fetch(e.request);
+    })
+  );
 });
