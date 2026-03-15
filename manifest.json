@@ -1,12 +1,12 @@
 {
-  "name": "Amulet Nexus v4",
-  "short_name": "ANx v4",
-  "description": "ระบบจัดการพอร์ตพระเครื่องผ่าน Supabase Real-time",
+  "name": "Amulet Nexus",
+  "short_name": "Amulet Nexus",
+  "description": "ติดตามพอร์ตพระเครื่อง กำไร/ขาดทุน Supabase Cloud",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0d0d0d",
-  "theme_color": "#FFD700",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "lang": "th",
   "icons": [
     {
@@ -21,5 +21,7 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["finance", "utilities"],
+  "screenshots": []
 }
