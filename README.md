@@ -1,73 +1,45 @@
-# 🪬 Amulet Nexus v3
+# 🪬 Amulet Nexus v4
 
-ติดตามพอร์ตพระเครื่อง · กำไร/ขาดทุน · Google Sheets & Drive
+ระบบจัดการพอร์ตพระเครื่องยุคใหม่ — รวดเร็ว เสถียร ด้วยขุมพลัง Supabase Real-time Database
 
-**Live:** https://a-nx.vercel.app
-
----
-
-## Features
-
-- 📊 Dashboard — ภาพรวมพอร์ต กำไร/ขาดทุน Win Rate
-- 🗂 Portfolio — รายการทั้งหมด ค้นหา กรอง
-- ➕ บันทึก — เพิ่มรายการพร้อมรูปภาพ
-- 📈 วิเคราะห์ — Win Rate ช่องทางที่ดีที่สุด
-- ☁️ Cloud — Google Sheets sync + Drive รูปภาพ
-- 📄 Export CSV / JSON Backup
-- 📱 PWA — ติดตั้งบนมือถือได้
+**Live Demo:** [https://a-nx.vercel.app](https://a-nx.vercel.app)
 
 ---
 
-## Stack
+## 🌟 มีอะไรใหม่ใน v4?
 
-- Vanilla HTML / CSS / JS (ไม่มี framework)
-- Google Sheets API v4
-- Google Drive API v3
-- Google OAuth 2.0 (GSI)
-- Vercel (static hosting)
-- PWA (Service Worker + Web Manifest)
+- ⚡ **Supabase Integration**: เปลี่ยนจาก Google Sheets มาเป็น Database แท้ๆ ทำให้โหลดข้อมูลไวขึ้น 10 เท่า
+- 📸 **Direct Image Upload**: อัปโหลดรูปภาพพระเครื่องจากมือถือลง Cloud Storage ได้โดยตรง
+- 📱 **PWA Ready**: ติดตั้งเป็นแอปบนมือถือได้ ลื่นไหลเหมือนแอปแท้
+- 🎨 **Modern UI**: ปรับปรุงหน้าตาใหม่ในธีม Black & Gold สวยงามและใช้งานง่ายขึ้น
 
 ---
 
-## Files
+## 🚀 ฟีเจอร์หลัก
 
-```
+- 📊 **Dashboard**: สรุปยอดรวมราคาพระเครื่องในพอร์ต
+- 📂 **Portfolio**: รายการพระเครื่องพร้อมรูปภาพและรายละเอียดที่มา
+- ➕ **Smart Entry**: บันทึกข้อมูลพระเครื่องพร้อมอัปโหลดรูปผ่านกล้องมือถือ
+- ☁️ **Cloud Sync**: ข้อมูลไม่หาย เปลี่ยนเครื่องใช้งานได้ทันทีผ่านบัญชี Supabase
+
+---
+
+## 🛠️ Stack (เทคโนโลยีที่ใช้)
+
+- **Frontend**: Vanilla HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+)
+- **Backend**: [Supabase](https://supabase.com/) (Database & Storage)
+- **Deployment**: [Vercel](https://vercel.com/)
+- **PWA**: Service Workers & Web Manifest
+
+---
+
+## 📂 โครงสร้างไฟล์
+
+```text
 ANx/
-├── index.html      ← แอปทั้งหมด
-├── sw.js           ← Service Worker (PWA + offline)
-├── manifest.json   ← PWA manifest
-├── vercel.json     ← Vercel headers + rewrites
-├── icon-192.png    ← App icon (ใส่เอง)
-├── icon-512.png    ← App icon (ใส่เอง)
-└── .gitignore
-```
-
----
-
-## Config (แก้ใน index.html)
-
-| ค่า | ตำแหน่ง |
-|---|---|
-| `GOOGLE_CLIENT_ID` | บรรทัด config ใน `<script>` |
-| `SPREADSHEET_ID` | บรรทัด config ใน `<script>` |
-| `SHEET_NAME` | บรรทัด config ใน `<script>` |
-
----
-
-## Deploy
-
-1. Push ขึ้น GitHub
-2. Import repo ใน [vercel.com](https://vercel.com)
-3. Deploy — ไม่ต้องตั้งค่าอะไรเพิ่ม
-
----
-
-## Workflow แก้โค้ด
-
-```
-แก้กับ Claude → ดาวน์โหลด → Acode → paste index.html → commit → Vercel auto-deploy ~30s
-```
-
----
-
-*v3 — ตัด Flo Finance ออกชั่วคราว เพิ่มกลับใน v4*
+├── index.html      ← หน้าแอปหลักและระบบเชื่อมต่อ Supabase
+├── sw.js           ← ระบบ Offline และ Cache v4
+├── manifest.json   ← การตั้งค่าแอป PWA v4
+├── vercel.json     ← การตั้งค่าความปลอดภัยของ Vercel
+├── icon-192.png    ← ไอคอนแอป (Small)
+└── icon-512.png    ← ไอคอนแอป (Large)
