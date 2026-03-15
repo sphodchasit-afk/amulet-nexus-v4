@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Amulet Nexus v4 (Sync)</title>
+    </head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://skuorantmixlyhmqhrop.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_6TTVmFUOfZWXctDpxW9Y9A_r5mY0sWI';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function saveAmulet() {
+            // ดึงค่าจากช่องกรอกข้อมูลในหน้าฟอร์ม
+            const name = document.querySelector('input[placeholder="ชื่อพระเครื่อง..."]')?.value;
+            const source = document.querySelector('input[placeholder="วัด/รุ่น/ที่มา..."]')?.value;
+            const price = document.querySelector('input[placeholder="0.00"]')?.value;
+            
+            if(!name) { alert("กรุณาใส่ชื่อพระเครื่องด้วยครับ"); return; }
+
+            const { error } = await supabase.from('amulets').insert([{ 
+                name: name, 
+                source: source, 
+                price: parseFloat(price) || 0 
+            }]);
+
+            if (error) {
+                alert('บันทึกไม่สำเร็จ: ' + error.message);
+            } else {
+                alert('บันทึกข้อมูลเรียบร้อยแล้ว!');
+                location.reload(); 
+            }
+        }
+
+        // เชื่อมปุ่ม "บันทึกข้อมูล"
+        document.addEventListener('DOMContentLoaded', () => {
+            const saveBtn = document.querySelector('.btn-p'); 
+            if(saveBtn) {
+                saveBtn.onclick = (e) => {
+                    e.preventDefault();
+                    saveAmulet();
+                };
+            }
+        });
+    </script>
+</body>
+</html>
