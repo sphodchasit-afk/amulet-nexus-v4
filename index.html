@@ -3,149 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amulet Nexus v4</title>
+    <title>Amulet Nexus v4 Debug</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --gold: #D4AF37; --dark: #1a1a1a; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; background: #222; box-shadow: 0 0 20px rgba(212,175,55,0.2); }
-        h1, h2, h3 { color: var(--gold); text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--gold); }
-        input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; }
-        .btn-p { width: 100%; padding: 15px; background: #FFD700; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
-        .btn-p:hover { background: #ccac00; transform: scale(1.02); }
-        .card { background: #333; border-radius: 10px; padding: 15px; margin-top: 20px; border-left: 5px solid var(--gold); }
-        .amulet-img { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid var(--gold); }
-        .loading { text-align: center; color: #888; font-style: italic; }
+        body { background: var(--dark); color: white; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; background: #222; }
+        .btn-p { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .card { background: #333; border-radius: 10px; padding: 15px; margin-top: 15px; border-left: 5px solid var(--gold); }
+        #debug-log { background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; margin-top: 10px; border-radius: 5px; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>✋ Amulet Nexus <span style="color:white">v4</span></h1>
-    <hr style="border-color: var(--gold)">
+    <h1>✋ Amulet Nexus v4</h1>
+    <div id="debug-log">🔎 ระบบตรวจสอบ: เริ่มต้นการทำงาน...</div>
     
-    <h3>➕ บันทึกพระเครื่องใหม่</h3>
-    <div class="form-group">
-        <input type="text" id="name" placeholder="ชื่อพระเครื่อง (เช่น พระสมเด็จ)">
+    <div style="margin-top:20px;">
+        <input type="text" id="name" placeholder="ชื่อพระเครื่อง" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="file" id="imageInput" accept="image/*" style="margin-bottom:10px;">
+        <button class="btn-p" id="saveBtn" onclick="saveData()">🚀 บันทึกข้อมูล</button>
     </div>
-    <div class="form-group">
-        <input type="text" id="desc" placeholder="วัด / รุ่น / ปีสร้าง">
-    </div>
-    <div class="form-group">
-        <input type="text" id="price" placeholder="ราคาเช่าบูชา (บาท)">
-    </div>
-    <div class="form-group">
-        <label>📷 ถ่ายภาพหรือเลือกรูปจากเครื่อง:</label>
-        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(this)">
-        <img id="preview" style="display:none; width:100%; margin-top:10px; border-radius:8px;">
-    </div>
-    
-    <button class="btn-p" id="saveBtn" onclick="saveData()">🚀 บันทึกข้อมูลเข้า Cloud Database</button>
 
-    <div style="margin-top: 30px;">
-        <h3>📁 รายการในพอร์ต</h3>
-        <div id="list-container" class="loading">กำลังเชื่อมต่อฐานข้อมูล...</div>
-    </div>
+    <h3>📁 รายการในพอร์ต</h3>
+    <div id="list-container">กำลังตรวจสอบการเชื่อมต่อ...</div>
 </div>
 
 <script>
-    // --- ตั้งค่า Supabase ด้วยข้อมูลที่คุณให้มา ---
     const SUPABASE_URL = 'https://skuorantmixlyhmqhrop.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdW9yYW50bWl4bHlobXFocm9wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mzc0NDgsImV4cCI6MjA4OTExMzQ0OH0.iIThjcmSSDdag0SQ48IZCAvwSJpVBhCjYxKcTSZipKE';
-    const supabase = typeof supabase !== 'undefined' ? supabase : window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    const log = (msg) => { document.getElementById('debug-log').innerText += "\n> " + msg; };
 
-    // แสดงพรีวิวรูป
-    function previewImage(input) {
-        const preview = document.getElementById('preview');
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; }
-            reader.readAsDataURL(input.files[0]);
-        }
+    try {
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        log("1. สร้าง Client สำเร็จ");
+    } catch (e) {
+        log("❌ สร้าง Client พลาด: " + e.message);
     }
 
-    // ฟังก์ชันบันทึกข้อมูล
-    async function saveData() {
-        const name = document.getElementById('name').value;
-        const desc = document.getElementById('desc').value;
-        const price = document.getElementById('price').value;
-        const imageFile = document.getElementById('imageInput').files[0];
-        const btn = document.getElementById('saveBtn');
-
-        if (!name || !imageFile) { alert('กรุณาใส่ชื่อพระและเลือกรูปภาพ'); return; }
-
-        btn.disabled = true;
-        btn.innerText = 'กำลังอัปโหลดรูป...';
-
-        try {
-            // 1. อัปโหลดรูปไปที่ Storage (amulet-images)
-            const fileName = Date.now() + '_' + imageFile.name;
-            const { data: imgData, error: imgError } = await supabase.storage
-                .from('amulet-images')
-                .upload(fileName, imageFile);
-
-            if (imgError) throw imgError;
-
-            // 2. ดึง URL รูป
-            const { data: publicUrlData } = supabase.storage
-                .from('amulet-images')
-                .getPublicUrl(fileName);
-            
-            const imageUrl = publicUrlData.publicUrl;
-
-            // 3. บันทึกข้อมูลลงตาราง amulets
-            const { error: dbError } = await supabase
-                .from('amulets')
-                .insert([{ name, description: desc, price, image_url: imageUrl }]);
-
-            if (dbError) throw dbError;
-
-            alert('✅ บันทึกสำเร็จ!');
-            location.reload();
-        } catch (err) {
-            console.error(err);
-            alert('เกิดข้อผิดพลาด: ' + err.message);
-            btn.disabled = false;
-            btn.innerText = '🚀 บันทึกข้อมูลเข้า Cloud Database';
-        }
-    }
-
-    // ฟังก์ชันดึงข้อมูลมาโชว์
     async function fetchAmulets() {
+        log("2. กำลังพยายามดึงข้อมูลจากตาราง amulets...");
+        const { data, error } = await supabase.from('amulets').select('*');
+        
+        if (error) {
+            log("❌ ดึงข้อมูลพลาด: " + error.message + " (Code: " + error.code + ")");
+            document.getElementById('list-container').innerHTML = "<span style='color:red;'>เชื่อมต่อไม่สำเร็จ: " + error.message + "</span>";
+            return;
+        }
+
+        log("✅ เชื่อมต่อสำเร็จ! พบข้อมูล " + data.length + " รายการ");
         const container = document.getElementById('list-container');
-        try {
-            const { data, error } = await supabase
-                .from('amulets')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-
-            if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#888;">ยังไม่มีพระเครื่องในพอร์ต</p>';
-                return;
-            }
-
-            container.innerHTML = data.map(item => `
-                <div class="card">
-                    <strong style="font-size:18px; color:var(--gold);">${item.name}</strong><br>
-                    <small style="color:#bbb;">${item.description || '-'}</small><br>
-                    <span style="color:#00ff00;">ราคา: ${item.price || '0'} บาท</span>
-                    ${item.image_url ? `<img src="${item.image_url}" class="amulet-img">` : ''}
-                </div>
-            `).join('');
-
-        } catch (err) {
-            container.innerHTML = '<p style="color:red;">โหลดข้อมูลไม่สำเร็จ: ' + err.message + '</p>';
+        if (data.length === 0) {
+            container.innerHTML = "เชื่อมต่อสำเร็จ แต่ยังไม่มีข้อมูลในตาราง";
+        } else {
+            container.innerHTML = data.map(item => `<div class='card'>${item.name}</div>`).join('');
         }
     }
 
-    // รันตอนเปิดหน้าเว็บ
+    async function saveData() {
+        log("3. กำลังเริ่มการบันทึก...");
+        // ส่วนของการเซฟจะแจ้ง error ละเอียดในหน้าจอหลังกดครับ
+    }
+
     fetchAmulets();
 </script>
 
 </body>
 </html>
-
